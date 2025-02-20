@@ -162,8 +162,10 @@ with gr.Blocks() as demo:
     gr.Markdown("""
                 ## 🔍 Preview Text Retrieval Results with Marqo Vector Database
                 <div style="font-size: 18px;">
-                <p><b>Instructions:</b> Browse through the retrieval results for the text prompt <i>"Pferd, Pferde"</i> by sliding the page slider (up to 100 first retrieval results can be inspected).
-                To visualise details about the retrieved text chunk, copy and paste the document name (e.g. <i>Z166069305_430</i>) in the search bar below and click on the <i>Inspect</i> button. Please note that pressing <i>Enter</i> does not work.
+                <p><b>Instructions:</b> Browse through the retrieval results for the text prompt <i>"Pferd, Pferde"</i> by sliding the page slider (up to 100 first retrieval results can be inspected). 
+                Select the data source: Choose between <i>Results Cleaned OCR, Results LLM Preprocessed OCR, and Results Original OCR</i>. 
+                To visualise details about the retrieved text chunk, copy and paste the document name (e.g. <i>Z166069305_430</i>) in the search bar below and click on the <i>Inspect</i> button. 
+                Please note that pressing <i>Enter</i> does not work. 
                 To inspect the page in the full book, click on <i>Open ONB Viewer</i> in the document details below.</p>
                 </div>""")
 
@@ -214,7 +216,10 @@ with gr.Blocks() as demo:
         This research was done in the <a href="https://onit.oeaw.ac.at/">Ottoman Nature in Travelogues (ONiT)</a> project and funded by the Austrian Science Fund (FWF: P 35245).
         The text retrieval was done with hybrid vector/lexical search (BM25) by using a <a href="https://docs.marqo.ai/">Marqo</a> 
         vector index. The texts were indexed as one page per document unit, and by splitting them in 2-sentence vectors and embedding them with 
-        <a href="https://huggingface.co/flax-sentence-embeddings/all_datasets_v4_mpnet-base">flax-sentence-embeddings/all_datasets_v4_mpnet-base</a> model.</p>
+        <a href="https://huggingface.co/flax-sentence-embeddings/all_datasets_v4_mpnet-base">flax-sentence-embeddings/all_datasets_v4_mpnet-base</a> model. 
+        <i>Results Cleaned OCR</i> contain the retrieval results for the vectorized OCR texts that were cleaned by using regular expressions. 
+        <i>Results LLM Preprocessed OCR</i> contain the retrieval results for the vectorized OCR texts that were automatically corrected with Llama3.1:70b. 
+        <i>Results Original OCR</i> contain the retrieval results for the original OCR texts (without any preprocessing).</p>
         <p>For more information, contact <a href="mailto:michela.vignoli@ait.ac.at">michela(dot)vignoli(at)ait(dot)ac(dot)at</a>.</p>
     </div>
     """)
