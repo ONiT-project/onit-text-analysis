@@ -13,6 +13,7 @@ import re
 results_clean = pd.read_csv("data/retrieval_results/sonnini_cleaned/i_onit-sonnini-DHd2025-clean-q_Pferd, Pferde.csv").head(100)
 results_prep = pd.read_csv("data/retrieval_results/sonnini_llm_corrected/i_onit-sonnini-DHd2025-prep-q_Pferd, Pferde.csv").head(100)
 results_orig = pd.read_csv("data/retrieval_results/sonnini_original_ocr/i_onit-test-index-sonnini-q_Pferd-Pferde.csv").head(100)
+annotations = pd.read_csv("data/annotations/DHd2025_referenceReports_annotations_preview_horses.csv")
 
 # Drop 'text_prep' from results_orig
 results_clean.drop(columns=['text_prep'], inplace=True)
@@ -23,7 +24,7 @@ results_orig['document'] = results_orig['document'].str[:-12]
 # Modify the "page" column to extract the numeric part and remove leading zeroes
 results_orig['page'] = results_orig['page'].str.extract(r'(\d+)', expand=False).astype(int)
 
-data_sources = {"Results Cleaned OCR": results_clean, "Results LLM Preprocessed OCR": results_prep, "Results Original OCR": results_orig}
+data_sources = {"Results Cleaned OCR": results_clean, "Results LLM Preprocessed OCR": results_prep, "Results Original OCR": results_orig, "Annotations": annotations}
 
 # Pagination settings
 R = 5  # Number of preview rows per page
@@ -42,7 +43,7 @@ def find_best_match(needle, haystack):
     
     # Find the best match that exceeds our threshold
     best_match = None
-    best_match_ratio = 0.9  # Initialize the best match ratio with our minimum threshold
+    best_match_ratio = 0.5  # Initialize the best match ratio with our minimum threshold
     
     for match in matches:
         i, j, n = match
@@ -163,7 +164,7 @@ with gr.Blocks() as demo:
                 ## 🔍 Preview Text Retrieval Results with Marqo Vector Database
                 <div style="font-size: 18px;">
                 <p><b>Instructions:</b> Browse through the retrieval results for the text prompt <i>"Pferd, Pferde"</i> by sliding the page slider (up to 100 first retrieval results can be inspected). 
-                Select the data source: Choose between <i>Results Cleaned OCR, Results LLM Preprocessed OCR, and Results Original OCR</i>. 
+                Select the data source: Choose between <i>Results Cleaned OCR, Results LLM Preprocessed OCR, Results Original OCR,</i> and our <i>Annotations</i> of text passages mentioning <i>horses</i> in the text. 
                 To visualise details about the retrieved text chunk, copy and paste the document name (e.g. <i>Z166069305_430</i>) in the search bar below and click on the <i>Inspect</i> button. 
                 Please note that pressing <i>Enter</i> does not work. 
                 To inspect the page in the full book, click on <i>Open ONB Viewer</i> in the document details below.</p>
