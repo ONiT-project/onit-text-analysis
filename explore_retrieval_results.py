@@ -1,3 +1,8 @@
+"""
+Simple Gradio app to preview the preliminary results for retrieving nature representations in imperfect OCR data extracted from 17-19 century German texts in the ONiT project.
+Code by Michela Vignoli partially generated with Chat GPT3, GPT4 (free version), and Claude (free version).
+"""
+
 # Import packages
 import gradio as gr
 import pandas as pd
@@ -23,17 +28,83 @@ data_sources = {"Results Cleaned OCR": results_clean, "Results LLM Preprocessed 
 # Pagination settings
 R = 5  # Number of preview rows per page
 
-# Define a function to highlight parts of the text
-def highlight_text(text, highlights):
-    # Ensure highlights is a list of strings
-    if isinstance(highlights, str):
-        highlights = [highlights]
-    # Wrap each highlight in <mark> tags
-    for highlight in highlights:
-        # Replace highlight text with a highlighted version
-        text = text.replace(highlight, f'<mark>{highlight}</mark>')
+def normalize_text(text):
+    """Normalize text for better matching by removing extra whitespace and standardizing characters."""
+    # Remove extra whitespace
+    text = ' '.join(text.split())
+    # Could add more normalization steps here if needed
     return text
 
+def find_best_match(needle, haystack):
+    """Find the best matching position of needle in haystack using fuzzy matching."""
+    matcher = SequenceMatcher(None, needle, haystack)
+    matches = matcher.get_matching_blocks()
+    
+    # Find the best match that exceeds our threshold
+    best_match = None
+    best_match_ratio = 0.9  # Initialize the best match ratio with our minimum threshold
+    
+    for match in matches:
+        i, j, n = match
+        if n > 0:  # Only consider non-zero length matches
+            subsequence = haystack[j:j+n]
+            ratio = SequenceMatcher(None, needle, subsequence).ratio()
+            if ratio > best_match_ratio:
+                best_match = (j, j+n)
+                best_match_ratio = ratio
+    
+    return best_match
+
+def highlight_text(text, highlights):
+    """
+    Highlight specified text segments using fuzzy matching and HTML mark tags.
+    
+    Args:
+        text (str): The original text to highlight
+        highlights (str or list): Text segment(s) to highlight
+    
+    Returns:
+        str: Text with highlights wrapped in <mark> tags
+    """
+    if not text or not highlights:
+        return text
+    
+    # Ensure highlights is a list
+    if isinstance(highlights, str):
+        highlights = [highlights]
+    
+    # Remove empty or None highlights
+    highlights = [h for h in highlights if h]
+    if not highlights:
+        return text
+    
+    # Sort highlights by length (longest first) to avoid nested highlights
+    highlights = sorted(highlights, key=len, reverse=True)
+    
+    # Store positions to highlight
+    positions_to_highlight = []
+    
+    # Find positions for each highlight
+    for highlight in highlights:
+        normalized_highlight = normalize_text(highlight)
+        normalized_text = normalize_text(text)
+        
+        match = find_best_match(normalized_highlight, normalized_text)
+        if match:
+            start, end = match
+            # Convert positions back to original text
+            original_start = len(text[:start].rstrip())
+            original_end = original_start + len(text[start:end].strip())
+            positions_to_highlight.append((original_start, original_end))
+    
+    # Sort positions by start position
+    positions_to_highlight.sort()
+    
+    # Apply highlights from end to start to avoid position shifting
+    for start, end in reversed(positions_to_highlight):
+        text = f"{text[:start]}<mark>{text[start:end]}</mark>{text[end:]}"
+    
+    return text
 
 # Function to create preview rows
 def preview_results(page, selected_data_source):
@@ -70,9 +141,9 @@ def show_details(document_name, selected_data_source):
     return f"""
     <div style="display: flex; justify-content: space-between; align-items: start;">
         <div style="width: 65%; font-size: 18px;">
-            <h3>📄 Preview: {row['barcode']}, Page {row['page']}</h3>
+            <h3>📄 Preview: {document_name}</h3>
             <p><b>Retrieved text chunk: </b><i>{row["unpacked_highlights"]}</i></p>
-            <p><b>OCR text (LLM-corrected): </b>{highlight_text(row.get('text_prep') or row.get('text_clean') or row.get('text'), row["unpacked_highlights"])}</p>
+            <p><b>Text on page {row['page']}: </b>{highlight_text(row.get('text_prep') or row.get('text_clean') or row.get('text'), row["unpacked_highlights"])}</p>
             <p><a href="https://digital.onb.ac.at/OnbViewer/viewer.faces?doc=ABO_%2B{row['barcode']}&order={row['page']}&view=SINGLE" target="_blank">🔍 Open ÖNB Viewer</a></p>
         </div>
         <div style="width: 30%; text-align: right;">
@@ -92,7 +163,8 @@ with gr.Blocks() as demo:
                 ## 🔍 Preview Text Retrieval Results with Marqo Vector Database
                 <div style="font-size: 18px;">
                 <p><b>Instructions:</b> Browse through the retrieval results for the text prompt <i>"Pferd, Pferde"</i> by sliding the page slider (up to 100 first retrieval results can be inspected).
-                To visualise details about the retrieved text chunk, copy and paste the document name (e.g. <i>Z166069305_430</i>) in the search bar below and click on the <i>Inspect</i> button. Please note that pressing <i>Enter</i> does not work.</p>
+                To visualise details about the retrieved text chunk, copy and paste the document name (e.g. <i>Z166069305_430</i>) in the search bar below and click on the <i>Inspect</i> button. Please note that pressing <i>Enter</i> does not work.
+                To inspect the page in the full book, click on <i>Open ONB Viewer</i> in the document details below.</p>
                 </div>""")
 
     data_source_dropdown = gr.Dropdown(choices=list(data_sources.keys()), label="Select Data Source", value="Results Cleaned OCR")
