@@ -164,7 +164,7 @@ with gr.Blocks() as demo:
                 ## 🔍 Preview Text Retrieval Results with Marqo Vector Database
                 <div style="font-size: 18px;">
                 <p><b>Instructions:</b> Browse through the retrieval results for the text prompt <i>"Pferd, Pferde"</i> by sliding the page slider (up to 100 first retrieval results can be inspected). 
-                Select the data source: Choose between <i>Results Cleaned OCR, Results LLM Preprocessed OCR, Results Original OCR,</i> and our <i>Annotations</i> of text passages mentioning <i>horses</i> in the text. 
+                Select the data source: Choose between <i>Results Cleaned OCR, Results LLM Preprocessed OCR, Results Original OCR,</i> and our <i>Annotations</i> of text passages mentioning <i>horses and kindred animals</i> in the text. 
                 To visualise details about the retrieved text chunk, copy and paste the document name (e.g. <i>Z166069305_430</i>) in the search bar below and click on the <i>Inspect</i> button. 
                 Please note that pressing <i>Enter</i> does not work. 
                 To inspect the page in the full book, click on <i>Open ONB Viewer</i> in the document details below.</p>
