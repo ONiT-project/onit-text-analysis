@@ -1,9 +1,14 @@
-# ONiT Text Analysis: Retrieval Experiments with Marqo Vector Index
-Preliminary results and code. Further documentation will be provided soon.
+# ONiT Text Analysis
+## Text Annotations
+In the data folder we included the final exports of the text annotations that were done in the (http://oeaw.onit.at/)[ONiT project]. Download at 
+
+## Retrieval Experiments with Marqo Vector Index
+Interim results and code of the presentation given at the (https://doi.org/10.5281/zenodo.14943196)[DHd 2025 in Bielefeld] are included in this repository as well. We experimented with an LLM to improve the imperfect OCR of the digitized sources as a preprocessing step for vector index search. The repository includes the preliminary dataset and a code for visualizing the retrieval results.
+
+# Funding Acknowledgement
+The ONiT project was funded by the Austrian Science Fund (FWF: P 35245).
 
 # References
-This preliminary data and code is published in context of the short presentation that will be given at DHd 2025 in Bielefeld:
-
 ```
 @inproceedings{vignoli_voll_2025,
 	address = {Bielefeld},
